@@ -67,7 +67,9 @@ async def get_current_user(
     token = credentials.credentials
     settings = get_settings()
 
-    # Mode 1: local verification (fast, no network)
+    # Mode 1: local HS256 verification (fast, no network)
+    # Falls back to Mode 2 if the secret is missing OR if alg mismatch occurs
+    # (Supabase now uses ES256 by default; legacy secret is HS256 only)
     if settings.supabase_jwt_secret:
         try:
             payload = jwt.decode(
@@ -84,13 +86,10 @@ async def get_current_user(
                 )
             return user_id
         except JWTError as e:
-            logger.warning(f"JWT local verification failed: {e}")
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid or expired token.",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            # If it's an algorithm mismatch (Supabase ES256 vs our HS256),
+            # fall through to remote API verification instead of failing hard.
+            logger.warning(f"JWT local verification failed ({e}), falling back to Supabase API")
 
-    # Mode 2: remote verification via Supabase API
-    logger.debug("SUPABASE_JWT_SECRET not set — verifying via Supabase API")
+    # Mode 2: remote verification via Supabase API (handles ES256 tokens)
+    logger.debug("Verifying token via Supabase API")
     return await _verify_via_supabase_api(token)
