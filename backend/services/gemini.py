@@ -43,6 +43,14 @@ async def generate_text(prompt: str, system_instruction: str | None = None) -> s
         settings = get_settings()
         genai.configure(api_key=settings.gemini_api_key)
 
+        from google.generativeai.types import HarmCategory, HarmBlockThreshold
+        safety_settings = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+        }
+
         model = genai.GenerativeModel(
             model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
@@ -50,6 +58,7 @@ async def generate_text(prompt: str, system_instruction: str | None = None) -> s
                 max_output_tokens=1024,
             ),
             system_instruction=system_instruction,
+            safety_settings=safety_settings
         )
 
         response = model.generate_content(prompt)
@@ -79,6 +88,14 @@ async def generate_chat_response(
         settings = get_settings()
         genai.configure(api_key=settings.gemini_api_key)
 
+        from google.generativeai.types import HarmCategory, HarmBlockThreshold
+        safety_settings = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+        }
+
         model = genai.GenerativeModel(
             model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
@@ -86,6 +103,7 @@ async def generate_chat_response(
                 max_output_tokens=512,
             ),
             system_instruction=system_instruction,
+            safety_settings=safety_settings
         )
 
         chat = model.start_chat(history=history)
@@ -107,6 +125,15 @@ async def generate_chat_response_stream(
         settings = get_settings()
         genai.configure(api_key=settings.gemini_api_key)
 
+        from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
+        safety_settings = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
+        }
+
         model = genai.GenerativeModel(
             model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
@@ -114,6 +141,7 @@ async def generate_chat_response_stream(
                 max_output_tokens=512,
             ),
             system_instruction=system_instruction,
+            safety_settings=safety_settings
         )
 
         chat = model.start_chat(history=history)
