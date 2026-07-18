@@ -53,11 +53,18 @@ async def send_message(
     )
     raw_history = list(reversed(history_result.data or []))
 
-    # Convert to Gemini format: role must be 'user' or 'model'
-    gemini_history = [
-        {"role": "model" if msg["role"] == "assistant" else "user", "parts": [msg["content"]]}
-        for msg in raw_history
-    ]
+    # Convert to Gemini format and sanitize (must strictly alternate)
+    gemini_history = []
+    for msg in raw_history:
+        role = "model" if msg["role"] == "assistant" else "user"
+        if not gemini_history:
+            gemini_history.append({"role": role, "parts": [msg["content"]]})
+        else:
+            if gemini_history[-1]["role"] == role:
+                # Merge consecutive messages of the same role
+                gemini_history[-1]["parts"][0] += f"\n\n{msg['content']}"
+            else:
+                gemini_history.append({"role": role, "parts": [msg["content"]]})
 
     # Build habit context
     habit_context = await build_habit_context(user_id, payload.habit_id)
