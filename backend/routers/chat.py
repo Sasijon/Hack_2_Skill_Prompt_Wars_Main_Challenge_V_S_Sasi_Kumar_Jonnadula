@@ -66,6 +66,10 @@ async def send_message(
             else:
                 gemini_history.append({"role": role, "parts": [msg["content"]]})
 
+    # Gemini history must ALWAYS start with a 'user' message
+    if gemini_history and gemini_history[0]["role"] == "model":
+        gemini_history.pop(0)
+
     # Build habit context
     habit_context = await build_habit_context(user_id, payload.habit_id)
     system_instruction = SYSTEM_PROMPT_TEMPLATE.format(
