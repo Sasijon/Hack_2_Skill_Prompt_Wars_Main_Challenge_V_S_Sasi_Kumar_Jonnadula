@@ -17,7 +17,11 @@ router = APIRouter(prefix="/habits", tags=["habits"])
 async def create_habit(
     payload: HabitCreate,
     user_id: str = Depends(get_current_user),
-):
+) -> dict:
+    """
+    Create a new habit for the authenticated user.
+    Initializes streaks to 0 and marks the habit as active.
+    """
     db = get_supabase()
     now = datetime.now(timezone.utc).isoformat()
     habit_id = str(uuid.uuid4())
@@ -45,7 +49,11 @@ async def create_habit(
 
 
 @router.get("/", response_model=list[HabitResponse])
-async def list_habits(user_id: str = Depends(get_current_user)):
+async def list_habits(user_id: str = Depends(get_current_user)) -> list[dict]:
+    """
+    List all active habits belonging to the authenticated user.
+    Ordered by creation date descending.
+    """
     db = get_supabase()
     result = (
         db.table("habits")
@@ -59,7 +67,11 @@ async def list_habits(user_id: str = Depends(get_current_user)):
 
 
 @router.get("/{habit_id}", response_model=HabitResponse)
-async def get_habit(habit_id: str, user_id: str = Depends(get_current_user)):
+async def get_habit(habit_id: str, user_id: str = Depends(get_current_user)) -> dict:
+    """
+    Retrieve a specific habit by its ID.
+    Ensures the user owns the habit before returning it.
+    """
     db = get_supabase()
     result = (
         db.table("habits")
@@ -79,7 +91,11 @@ async def update_habit(
     habit_id: str,
     payload: HabitUpdate,
     user_id: str = Depends(get_current_user),
-):
+) -> dict:
+    """
+    Update details of an existing habit.
+    Only provided fields in the payload will be updated.
+    """
     db = get_supabase()
 
     # Verify ownership
@@ -99,7 +115,11 @@ async def update_habit(
 
 
 @router.delete("/{habit_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_habit(habit_id: str, user_id: str = Depends(get_current_user)):
+async def delete_habit(habit_id: str, user_id: str = Depends(get_current_user)) -> None:
+    """
+    Soft delete a habit by marking it as inactive.
+    The habit will no longer appear in active habit lists.
+    """
     db = get_supabase()
     existing = db.table("habits").select("id").eq("id", habit_id).eq("user_id", user_id).execute()
     if not existing.data:
