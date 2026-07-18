@@ -18,7 +18,7 @@ def get_gemini_model() -> genai.GenerativeModel:
         settings = get_settings()
         genai.configure(api_key=settings.gemini_api_key)
         _model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
                 temperature=0.7,
                 max_output_tokens=1024,
@@ -44,7 +44,7 @@ async def generate_text(prompt: str, system_instruction: str | None = None) -> s
         genai.configure(api_key=settings.gemini_api_key)
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
                 temperature=0.7,
                 max_output_tokens=1024,
@@ -80,7 +80,7 @@ async def generate_chat_response(
         genai.configure(api_key=settings.gemini_api_key)
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
                 temperature=0.75,
                 max_output_tokens=512,
@@ -108,7 +108,7 @@ async def generate_chat_response_stream(
         genai.configure(api_key=settings.gemini_api_key)
 
         model = genai.GenerativeModel(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-flash-latest",
             generation_config=genai.GenerationConfig(
                 temperature=0.75,
                 max_output_tokens=512,
