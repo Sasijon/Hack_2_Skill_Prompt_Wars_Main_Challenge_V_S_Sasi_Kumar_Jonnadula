@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: habitheal-api
+    env: python
+    region: oregon
+    plan: free
+
+    # Render looks for source code in the repo root by default.
+    # Since backend/ is a subdirectory, set rootDir so pip install
+    # finds requirements.txt correctly.
+    rootDir: backend
+
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+
+    # Render uses this to verify the service is healthy after deploy.
+    # Must return 2xx. Our /health endpoint does exactly that.
+    healthCheckPath: /health
+
+    # Auto-deploy on every push to main
+    autoDeploy: true
+
+    envVars:
+      - key: SUPABASE_URL
+        sync: false          # Set manually in Render dashboard
+
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false          # Set manually — never commit this value
+
+      - key: SUPABASE_JWT_SECRET
+        sync: false          # From Supabase Dashboard → Settings → API → JWT Settings
+
+      - key: GEMINI_API_KEY
+        sync: false          # From https://aistudio.google.com/app/apikey
+
+      - key: APP_ENV
+        value: production
+
+      - key: APP_VERSION
+        value: "1.0.0"
+
+      - key: CORS_ORIGINS
+        # Update the Vercel domain after first deploy.
+        # Format: comma-separated list, no trailing slashes.
+        sync: false
