@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "dataModelVersion": 1,
+  "id": "sess_8702fb09-04fb-485b-b2ae-f3bc48e2d6fd",
+  "title": "Breaking Bad Habits & Addiction\n\n \n\nBuild a GenAI-powered solution that helps...",
+  "agentMode": "vibe",
+  "workspacePaths": [
+    "c:\\Users\\jvsgp\\Hack_2_Skill_Prompt_Wars_Main_Challenge_V_S_Sasi_Kumar_Jonnadula"
+  ],
+  "createdAt": "2026-07-18T06:07:38.428Z",
+  "lastModifiedAt": "2026-07-18T06:15:52.192Z",
+  "autopilot": true,
+  "semanticReviewEnabled": true,
+  "ftaEnabled": false,
+  "specPlanEnabled": false,
+  "specWorkflow": "quick",
+  "specSkipClarificationEnabled": true,
+  "status": "idle"
+}
