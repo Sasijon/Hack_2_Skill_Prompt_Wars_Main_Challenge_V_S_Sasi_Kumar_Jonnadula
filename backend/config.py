@@ -8,7 +8,7 @@ class Settings(BaseSettings):
 
     supabase_url: str
     supabase_service_role_key: str
-    supabase_jwt_secret: str
+    supabase_jwt_secret: str = ""   # Optional: fetched from Supabase if blank
     gemini_api_key: str
     app_env: str = "development"
     app_version: str = "1.0.0"
