@@ -92,6 +92,12 @@ async def send_message(
                 full_reply += chunk
                 data = json.dumps({"chunk": chunk, "message_id": assistant_msg_id})
                 yield f"data: {data}\n\n"
+        except Exception as e:
+            # Fallback if Gemini fails (e.g. quota, safety filters)
+            fallback_msg = "I'm having a little trouble connecting right now, but I'm here for you! Let's talk more when I'm back online."
+            full_reply += fallback_msg
+            data = json.dumps({"chunk": fallback_msg, "message_id": assistant_msg_id})
+            yield f"data: {data}\n\n"
         finally:
             if full_reply:
                 db.table("chat_messages").insert([
