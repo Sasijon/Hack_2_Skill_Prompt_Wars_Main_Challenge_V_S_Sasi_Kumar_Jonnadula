@@ -92,22 +92,29 @@ async def get_weekly_insights(user_id: str = Depends(get_current_user)):
 
     prompt = f"Here is the user's habit data for the week of {week_start.isoformat()} to {today.isoformat()}:\n\n{json.dumps(habit_summaries, indent=2)}\n\nProvide analysis and recommendations."
 
-    raw_response = await generate_text(prompt=prompt, system_instruction=INSIGHTS_SYSTEM_PROMPT)
-
-    # Parse JSON response from Gemini
     try:
-        # Strip markdown code fences if present
+        raw_response = await generate_text(prompt=prompt, system_instruction=INSIGHTS_SYSTEM_PROMPT)
+
+        # Parse JSON response from Gemini
         cleaned = raw_response.strip()
         if cleaned.startswith("```"):
             cleaned = cleaned.split("```")[1]
             if cleaned.startswith("json"):
                 cleaned = cleaned[4:]
+        
         parsed = json.loads(cleaned.strip())
-        summary = parsed.get("summary", raw_response)
-        recommendations = parsed.get("recommendations", [])
-    except (json.JSONDecodeError, KeyError):
-        summary = raw_response
-        recommendations = []
+        if isinstance(parsed, dict):
+            summary = parsed.get("summary", raw_response)
+            recommendations = parsed.get("recommendations", [])
+            if not isinstance(recommendations, list):
+                recommendations = []
+        else:
+            summary = raw_response
+            recommendations = []
+    except Exception as e:
+        # Fallback if Gemini fails entirely (timeout, quota, parse error)
+        summary = "Your habit data for this week has been recorded. Keep logging daily to see detailed AI insights."
+        recommendations = ["Continue logging daily", "Stay consistent with your goals", "Check back later"]
 
     insight_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
