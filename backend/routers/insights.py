@@ -69,10 +69,14 @@ async def get_weekly_insights(user_id: str = Depends(get_current_user)):
         )
         logs = logs_result.data or []
 
-        slip_days = sum(1 for log in logs if log["slipped"])
+        slip_days = sum(1 for log in logs if log.get("slipped"))
         resist_days = len(logs) - slip_days
-        avg_intensity = sum(log["intensity"] for log in logs) / len(logs) if logs else 0
-        avg_value = sum(log["value"] for log in logs) / len(logs) if logs else 0
+        
+        valid_intensities = [log.get("intensity") for log in logs if log.get("intensity") is not None]
+        avg_intensity = sum(valid_intensities) / len(valid_intensities) if valid_intensities else 0
+        
+        valid_values = [log.get("value") for log in logs if log.get("value") is not None]
+        avg_value = sum(valid_values) / len(valid_values) if valid_values else 0
 
         habit_summaries.append({
             "habit": habit["name"],
