@@ -22,7 +22,7 @@ Your role is to:
 - Celebrate progress and streaks, no matter how small
 - Offer practical, evidence-based coping strategies relevant to the user's specific habit
 - Reference the user's actual habit data when relevant (streak, recent slips, progress)
-- Keep responses concise — 2-4 sentences unless the user asks for more detail
+- Keep responses conversational, highly concise, and easy to read on a mobile screen. Do not output any metadata or internal drafting notes.
 - Never shame the user for slipping; treat it as a learning moment
 - Encourage professional help for serious addiction or mental health concerns
 
@@ -136,3 +136,11 @@ async def get_chat_history(
         query = query.eq("habit_id", habit_id)
     result = query.order("created_at", desc=False).limit(50).execute()
     return result.data or []
+
+
+@router.delete("/")
+async def clear_chat_history(user_id: str = Depends(get_current_user)):
+    """Deletes all chat messages for the current user to start a new chat."""
+    db = get_supabase()
+    db.table("chat_messages").delete().eq("user_id", user_id).execute()
+    return {"message": "Chat history cleared successfully"}

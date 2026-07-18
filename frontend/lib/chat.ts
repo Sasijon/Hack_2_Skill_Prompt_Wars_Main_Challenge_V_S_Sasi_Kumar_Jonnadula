@@ -86,3 +86,7 @@ export async function fetchChatHistory(habitId?: string): Promise<ChatMessage[]>
   const params = habitId ? `?habit_id=${habitId}` : '';
   return apiRequest<ChatMessage[]>(`/chat/history${params}`);
 }
+
+export async function clearChatHistory(): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>('/chat/', { method: 'DELETE' });
+}

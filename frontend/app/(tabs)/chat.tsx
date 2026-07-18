@@ -17,7 +17,7 @@ import {
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { ChatMessage } from '@/types';
-import { sendChatMessageStream, fetchChatHistory } from '@/lib/chat';
+import { sendChatMessageStream, fetchChatHistory, clearChatHistory } from '@/lib/chat';
 import { useAuth } from '@/context/AuthContext';
 
 // ─── Bubble ──────────────────────────────────────────────────────────────────
@@ -174,6 +174,18 @@ export default function ChatScreen() {
     []
   );
 
+  async function handleClear() {
+    try {
+      setLoading(true);
+      await clearChatHistory();
+      setMessages([]);
+    } catch (err) {
+      setError('Failed to clear chat history.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -183,12 +195,22 @@ export default function ChatScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerInfo}>
-          <Text style={styles.headerTitle} accessibilityRole="header">
-            AI Coach
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Text style={styles.headerTitle} accessibilityRole="header">
+              AI Coach
+            </Text>
+            <View style={styles.onlineDot} accessibilityLabel="AI Coach is online" />
+          </View>
           <Text style={styles.headerSubtitle}>Powered by Gemini 1.5 Flash</Text>
         </View>
-        <View style={styles.onlineDot} accessibilityLabel="AI Coach is online" />
+        <TouchableOpacity 
+          style={styles.clearBtn} 
+          onPress={handleClear}
+          accessibilityLabel="Start a new chat"
+          accessibilityRole="button"
+        >
+          <Text style={styles.clearBtnText}>New Chat</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Error */}
@@ -282,10 +304,21 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
   headerSubtitle: { fontSize: 11, color: '#9CA3AF', marginTop: 1 },
   onlineDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#10B981',
+  },
+  clearBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#EEF2FF',
+    borderRadius: 16,
+  },
+  clearBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#4F46E5',
   },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   errorBanner: {
